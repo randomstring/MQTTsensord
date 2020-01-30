@@ -1,0 +1,40 @@
+{
+    "mqtt_host": "mqtt.example.com",
+    "mqtt_port": 1883,
+    "mqtt_topic": "sensors/#",
+    "mqtt_user": "sensors",
+    "mqtt_password": "PASSWORD",
+    
+    
+    "sensors": {
+	{
+	    "type": "dht22",
+	    "name": "environment",
+	    "desc": "Temperature and Humidity"
+	    "config": {
+		"gpio": 12
+	    }
+	},
+	{
+	    "type": "apcupsd",
+	    "name": "UPS1",
+	    "desc": "apcupsd stats for UPS1"
+	    "config": {
+		"usb": "/dev/usb/ups1",
+		"fields": ["STATUS", "MODEL", "UPSNAME", "LINEV", "BCHARGE", "TIMELEFT"]
+	    }
+	},
+	{
+	    "type": "servo",
+	    "name": "servo0",
+            "desc": "This is an example servo config",
+	    "topic": "sensors/servo0",
+	    "config": {
+		"channel": 0,
+		"pulsewidth_min": 685,
+		"pulsewidth_max": 2070,
+		"actuation_range": 2160
+	    }
+	}
+    }
+}

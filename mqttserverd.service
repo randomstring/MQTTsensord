@@ -1,0 +1,15 @@
+[Unit]
+Description=MQTT sensor server
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/python3 /home/pi/mqttserverd/mqttserverdd.py
+WorkingDirectory=/home/pi/mqttserverd
+StandardOutput=inherit
+StandardError=inherit
+Type=idle
+Restart=on-success
+User=pi
+
+[Install]
+WantedBy=multi-user.target

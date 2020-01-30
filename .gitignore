@@ -127,3 +127,12 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+#emacs
+*~
+
+#my dirs to ignore
+secret
+upsdata
+
+.DS_Store
