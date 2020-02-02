@@ -1,16 +1,20 @@
 #!/usr/bin/env python3
 #
-# Simple script to read output from apcupsd from stdin and print
+# Simple script to read output from apcaccess from stdin and print
 # JSON blob of useful data.
 #
 
 import sys
 import re
+import subprocess
+import json
 import os
 import time
 import argparse
-import json
 
+
+apcaccess_cmd = '/sbin/apcaccess'
+apcaccess_args = [apcaccess_cmd, '-h', 'localhost:3551']
 
 wanted_keys = ('UPSNAME', 'HOSTNAME', 'STATUS', 'BCHARGE', 'TIMELEFT', 'LINEV')
 
@@ -19,7 +23,20 @@ units_re = re.compile(' (Percent|Volts|Minutes|Seconds)$', re.IGNORECASE)
 errors = 0
 ups_data = {}
 
-for rawline in sys.stdin:
+# TODO: add try/except wrapper
+apcaccess_subprocess = subprocess.Popen(apcaccess_args,
+                                        stdout=subprocess.PIPE,
+                                        stderr=subprocess.STDOUT)
+stdout, stderr = apcaccess_subprocess.communicate()
+# print(stdout.decode('utf-8'))
+
+if stderr:
+    ups_data['errors_cmd'] = 1
+    ups_data['error_msg'] = "apcaccess writing to stderr"
+    print(stderr.decode('utf-8'))
+
+# for rawline in sys.stdin:
+for rawline in stdout.decode('utf-8').splitlines():
     line = rawline.rstrip()
     try:
         (k, v) = [s.rstrip() for s in line.split(': ', 1)]
