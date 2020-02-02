@@ -14,21 +14,32 @@ from adafruit_servokit import ServoKit
 debug_p = True
 
 
-# The callback for when the client receives a CONNACK response from the server.
+#
+# Callback for when the client receives a CONNACK response from the server.
+#
 def on_connect(client, userdata, flags, rc):
-    client.subscribe(userdata['topic'])
-    client.publish('sensor/UPDATE', payload='{"update":"true"}', qos=0, retain=False)
-    if rc != 0:
-        userdata['logger'].warning("subscibing to topic [" +
-                                   userdata['topic'] +
-                                   "] result code " + str(rc))
-    else:
-        userdata['logger'].debug("subscibing to topic [" +
-                                 userdata['topic'] +
-                                 "] result code " + str(rc))
+    if 'subscribe' in userdata:
+        for subscribe_topic in userdata['subscribe']:
+            client.subscribe(subscribe_topic)
+            # log result codes
+            if rc != 0:
+                userdata['logger'].warning("subscibing to topic [" +
+                                           subscribe_topic +
+                                           "] result code " + str(rc))
+            else:
+                userdata['logger'].debug("subscibing to topic [" +
+                                         subscribe_topic +
+                                         "] result code " + str(rc))
+    # Send notify messages if needed
+    if 'notify' in userdata:
+        for notify_topic in userdata['notify']:
+            client.publish(notify_topic, payload='{"notify":"true"}',
+                           qos=0, retain=False)
 
 
-# Callback for MQTT messages
+#
+# Try/except wrapper for MQTT Messages
+#
 def on_message(client, userdata, message):
     # wrap the on_message() processing in a try:
     try:
@@ -37,6 +48,9 @@ def on_message(client, userdata, message):
         userdata['logger'].error("on_message() failed: {}".format(e))
 
 
+#
+# Callback for MQTT Messages
+#
 def _on_message(client, userdata, message):
     topic = message.topic
 
@@ -77,64 +91,12 @@ def _on_message(client, userdata, message):
     move_clock_hands(name, msg_data, userdata)
 
 
-def move_clock_hands(name, message, userdata):
-    config_data = userdata['config_data']
-    state = None
-    latitude = None
-    longitude = None
-    distance = 0.0
-    if 'state' in message:
-        state = message['state']
-    if 'latitude' in message:
-        latitude = float(message['latitude'])
-    if 'longitude' in message:
-        longitude = float(message['longitude'])
-
-    distance = 0.0
-    if latitude and longitude:
-        latitude_home = float(config_data['latitude'])
-        longitude_home = float(config_data['longitude'])
-        distance = great_circle((latitude_home, longitude_home),
-                                (latitude, longitude)).miles
-
-    if debug_p:
-        print("Move " + name + " hand to " + state +
-              " ({0:.1f} miles away)".format(distance))
-
-    if name not in config_data['hand']:
-        if debug_p:
-            print("Person " + name + " is not tracked by a clock hand")
-        return
-    hand = config_data['hand'][name]
-
-    if hand not in config_data['channel']:
-        userdata['logger'].error("Hand " + hand +
-                                 " does not have a specified PWM channel")
-        return
-    channel = config_data['channel'][hand]
-
-    if state not in states:
-        userdata['logger'].error("Unknown target state [" + state + "]")
-        return
-
-    target_state = states[state]
-    base_angle = float(target_state['angle'])
-    theta = float(target_state['theta'])
-    style = target_state['offset_style']
-
-    offset = angle_offset(base_angle, theta, distance, hand, style)
-    servo_angle = int(2 * (base_angle + offset))
-    userdata['kit'].servo[channel].angle = servo_angle
-
-    userdata['logger'].info("Move [" + name +
-                            "] hand to [" + state +
-                            "] ({0:.1f} miles away)".format(distance))
-
-    if debug_p:
-        print("base_angle [" + str(base_angle) + "] theta [" + str(theta) +
-              "] style [" + style + "]")
-        print("distance [", distance, "]  offset [", offset, "]")
-        print("servo angle: ", servo_angle)
+def move_servo(name, message, userdata):
+    #
+    # move a sevro
+    #
+    # config_data = userdata['config_data']
+    pass
 
 
 def do_something(logf, configf):
@@ -212,7 +174,7 @@ def do_something(logf, configf):
     mqttc.on_message = on_message
 
     if port == 4883 or port == 4884:
-        mqttc.tls_set('/etc/ssl/certs/ca-certificates.crt');
+        mqttc.tls_set('/etc/ssl/certs/ca-certificates.crt')
 
     #     mqttc.tls_set(ca_certs=TLS_CERT_PATH, certfile=None,
     #                    keyfile=None, cert_reqs=ssl.CERT_REQUIRED,
