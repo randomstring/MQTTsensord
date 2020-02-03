@@ -8,8 +8,6 @@ import daemon
 import json
 import paho.mqtt.client as mqtt
 import lockfile
-from geopy.distance import great_circle
-from adafruit_servokit import ServoKit
 
 debug_p = True
 
@@ -126,45 +124,24 @@ def do_something(logf, configf):
     # connect to MQTT server
     host = config_data['mqtt_host']
     port = config_data['mqtt_port'] if 'mqtt_port' in config_data else 4884
-    topic = config_data['mqtt_topic'] if 'mqtt_topic' in config_data else 'mqttserverd/#'
+    interval = config_data['interval'] if 'interval' in config_data else 5
 
-    logger.info("connecting to host " + host + ":" + str(port) +
-                " topic " + topic)
+    logger.info("connecting to host " + host + ":" + str(port))
 
     if debug_p:
-        print("connecting to host " + host + ":" + str(port) +
-              " topic " + topic)
+        print("connecting to host " + host + ":" + str(port))
 
-    # configure servos and zero clock hands
-    kit = ServoKit(channels=16)
-    pulsewidth_min = 685
-    pulsewidth_max = 2070
-    actuation_range = 2160
-    if 'pulsewidth_min' in config_data:
-        pulsewidth_min = int(config_data['pulsewidth_min'])
-    if 'pulsewidth_max' in config_data:
-        pulsewidth_max = int(config_data['pulsewidth_max'])
-    if 'actuation_range' in config_data:
-        actuation_range = int(config_data['actuation_range'])
-
-    for (hand, servo) in config_data['channel'].items():
-        kit.servo[servo].actuation_range = actuation_range
-        kit.servo[servo].set_pulse_width_range(pulsewidth_min, pulsewidth_max)
-        # kit.servo[servo].angle = 0
-
-    clockdata = {
+    userdata = {
         'logger': logger,
         'host': host,
         'port': port,
-        'topic': topic,
-        'kit': kit,
         'config_data': config_data,
         }
 
     # how to mqtt in python see https://pypi.org/project/paho-mqtt/
     mqttc = mqtt.Client(client_id='mqttsensord',
                         clean_session=True,
-                        userdata=clockdata)
+                        userdata=userdata)
 
     mqttc.username_pw_set(config_data['mqtt_user'],
                           config_data['mqtt_password'])
@@ -176,13 +153,20 @@ def do_something(logf, configf):
     if port == 4883 or port == 4884:
         mqttc.tls_set('/etc/ssl/certs/ca-certificates.crt')
 
-    #     mqttc.tls_set(ca_certs=TLS_CERT_PATH, certfile=None,
-    #                    keyfile=None, cert_reqs=ssl.CERT_REQUIRED,
-    #                    tls_version=ssl.PROTOCOL_TLSv1_2, ciphers=None)
-    #     mqttc.tls_insecure_set(False)
-
     mqttc.connect(host, port, 60)
-    mqttc.loop_forever()
+    mqttc.loop_start()
+
+    while True:
+        for sensor in config_data['sensor_list']:
+            read_sensor(sensor, user_data)
+        time.sleep(interval)
+
+
+#
+# read_sensor()  read an individual sensor and send MQTT message
+#
+def read_sensor(sensor, user_data):
+    pass
 
 
 def start_daemon(pidf, logf, wdir, configf, nodaemon):
@@ -199,15 +183,13 @@ def start_daemon(pidf, logf, wdir, configf, nodaemon):
             print("mqttserver: pidf = {}    logf = {}".format(pidf, logf))
             print("mqttserver: about to start daemonization")
 
-        with daemon.DaemonContext(working_directory=wdir,
-                                  umask=0o002,
+        with daemon.DaemonContext(working_directory=wdir, umask=0o002,
                                   pidfile=lockfile.FileLock(pidf),) as context:
             do_something(logf, configf)
 
 
-
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Weasley Clock Deamon")
+    parser = argparse.ArgumentParser(description="MQTT Sensor Deamon")
     parser.add_argument('-p', '--pid-file', default='/home/pi/mqttsensord/mqttserver.pid')
     parser.add_argument('-l', '--log-file', default='/home/pi/mqttsensord/mqttserver.log')
     parser.add_argument('-d', '--working-dir', default='/home/pi/mqttsensord')
