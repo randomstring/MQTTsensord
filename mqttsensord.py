@@ -10,6 +10,7 @@ import paho.mqtt.client as mqtt
 import lockfile
 import re
 import subprocess
+import Adafruit_DHT as dht
 
 debug_p = True
 
@@ -84,6 +85,17 @@ def apcaccess_json(host='localhost', port='3551'):
     return json_response(ups_data)
 
 
+def read_dht(client, sensor, userdata, dht_type=dht.DHT22):
+    sensor_data = {}
+    # TODO: error checking on GPIO
+    humidity, temperature = dht.read_retry(dht_type, sensor['GPIO'])
+    humidity = round(humidity, 2)
+    temperature = round(temperature, 2)
+    sensor_data['temperature'] = temperature
+    sensor_data['humidity'] = humidity
+    return(json_response(sensor_data))
+
+
 #
 # read_sensor()  read an individual sensor and send MQTT message
 #
@@ -94,11 +106,9 @@ def read_sensor(client, sensor, userdata):
         sensor_data = apcaccess_json(sensor['host'],
                                      sensor['port'])
     elif sensor_type == 'dht22':
-        sensor_data = json_response({'error':
-                                     sensor_type + ' not yet supported'})
+        sensor_data = read_dht(client, sensor, userdata, dht.DHT22)
     elif sensor_type == 'dht11':
-        sensor_data = json_response({'error':
-                                     sensor_type + ' not yet supported'})
+        sensor_data = read_dht(client, sensor, userdata, dht.DHT11)
     else:
         sensor_data = json_response({'error':
                                      'bad sensor type: ' + sensor_type})
