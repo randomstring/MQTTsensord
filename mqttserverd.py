@@ -87,7 +87,7 @@ def apcaccess_json(host='localhost', port='3551'):
 #
 # read_sensor()  read an individual sensor and send MQTT message
 #
-def read_sensor(client, sensor, user_data):
+def read_sensor(client, sensor, userdata):
 
     sensor_type = sensor['type']
     if sensor_type == 'apcups':
@@ -102,6 +102,11 @@ def read_sensor(client, sensor, user_data):
     else:
         sensor_data = json_response({'error':
                                      'bad sensor type: ' + sensor_type})
+
+    userdata['logger'].debug("publish sensor data [" +
+                             sensor['topic'])
+    userdata['logger'].debug("publish sensor data [" +
+                             sensor_data)
 
     client.publish(sensor['topic'], payload=sensor_data, qos=0,
                    retain=False)
@@ -255,6 +260,9 @@ def do_something(logf, configf):
         for sensor in config_data['sensors']:
             read_sensor(mqttc, sensor, userdata)
         time.sleep(interval)
+
+    mqttc.disconnect()
+    mqttc.loop_stop()
 
 
 def start_daemon(pidf, logf, wdir, configf, nodaemon):
