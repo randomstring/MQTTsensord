@@ -1,40 +1,36 @@
 {
     "mqtt_host": "mqtt.example.com",
     "mqtt_port": 1883,
-    "mqtt_topic": "sensors/#",
-    "mqtt_user": "sensors",
-    "mqtt_password": "PASSWORD",
-    
-    
-    "sensors": {
+    "mqtt_user": "MQTTUSER",
+    "mqtt_password": "MQTTPASSWORD",
+
+    "sensors": [
+	{
+	    "type": "apcups",
+	    "name": "UPS1",
+	    "topic": "sensor/ups1",
+	    "host": "localhost",
+	    "port": 3551
+	},
+	{
+	    "type": "apcups",
+	    "name": "UPS2",
+	    "topic": "sensor/ups2",
+	    "host": "localhost",
+	    "port": 3552
+	},
+	{
+	    "type": "apcups",
+	    "name": "UPS3",
+	    "topic": "sensor/ups3",
+	    "host": "localhost",
+	    "port": 3552
+	},
 	{
 	    "type": "dht22",
-	    "name": "environment",
-	    "desc": "Temperature and Humidity"
-	    "config": {
-		"gpio": 12
-	    }
-	},
-	{
-	    "type": "apcupsd",
-	    "name": "UPS1",
-	    "desc": "apcupsd stats for UPS1"
-	    "config": {
-		"usb": "/dev/usb/ups1",
-		"fields": ["STATUS", "MODEL", "UPSNAME", "LINEV", "BCHARGE", "TIMELEFT"]
-	    }
-	},
-	{
-	    "type": "servo",
-	    "name": "servo0",
-            "desc": "This is an example servo config",
-	    "topic": "sensors/servo0",
-	    "config": {
-		"channel": 0,
-		"pulsewidth_min": 685,
-		"pulsewidth_max": 2070,
-		"actuation_range": 2160
-	    }
+	    "name": "Environmental",
+	    "topic": "sensor/environment/office",
+	    "gpio": 18
 	}
-    }
+    ]
 }
