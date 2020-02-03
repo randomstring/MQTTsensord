@@ -3,6 +3,7 @@
     "mqtt_port": 1883,
     "mqtt_user": "MQTTUSER",
     "mqtt_password": "MQTTPASSWORD",
+    "interval":  15,
 
     "sensors": [
 	{
@@ -30,6 +31,12 @@
 	    "type": "dht22",
 	    "name": "Environmental",
 	    "topic": "sensor/environment/office",
+	    "gpio": 4
+	},
+	{
+	    "type": "dht11",
+	    "name": "Environmental",
+	    "topic": "sensor/environment/garage",
 	    "gpio": 18
 	}
     ]
