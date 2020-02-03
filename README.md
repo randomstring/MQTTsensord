@@ -63,8 +63,21 @@ NOTE: You will need to edit ``/home/pi/mqttsensord/mqttsensord.json``
 with your MQTT server credentials and configure your local sensors.
 
 
-## Future Plans and Features
+# Future Plans and Features
 
 * More sophisticated scheduling. Allow sensors to be polled at different rates.
 * Add MQTT LWT support
 * MQTT subscribe to channels to publish to local services
+
+# Troubleshooting
+
+First, make sure you have the MQTT server, username, and password
+correct in the ``mqttsensord.json`` config file. Second, make sure the
+server you're talking to is listing on the correct port, 1883 by
+default. If you're using port 4883, make sure SSL is configured
+correctly on both ends. Third, make sure that the MQTT server you're
+connecting to is recieving the messages. One possible problem is if
+the reciever is not listening for the given topic. Adding the MQTT
+wildcard ``#`` as a listening topic is one way to get around
+this. Test connectivity with the mqtt command line tools to send a few
+test messages.
