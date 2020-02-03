@@ -197,7 +197,7 @@ def do_something(logf, configf):
     #
     # setup logging
     #
-    logger = logging.getLogger('mqttserverd')
+    logger = logging.getLogger('mqttsensord')
     logger.setLevel(logging.INFO)
     fh = logging.FileHandler(logf)
     fh.setLevel(logging.INFO)
@@ -267,9 +267,9 @@ def start_daemon(pidf, logf, wdir, configf, nodaemon):
     else:
         # daemon mode
         if debug_p:
-            print("mqttserver: entered run()")
-            print("mqttserver: pidf = {}    logf = {}".format(pidf, logf))
-            print("mqttserver: about to start daemonization")
+            print("mqttsensor: entered run()")
+            print("mqttsensor: pidf = {}    logf = {}".format(pidf, logf))
+            print("mqttsensor: about to start daemonization")
 
         with daemon.DaemonContext(working_directory=wdir, umask=0o002,
                                   pidfile=lockfile.FileLock(pidf),) as context:
@@ -278,8 +278,8 @@ def start_daemon(pidf, logf, wdir, configf, nodaemon):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="MQTT Sensor Deamon")
-    parser.add_argument('-p', '--pid-file', default='/home/pi/mqttsensord/mqttserver.pid')
-    parser.add_argument('-l', '--log-file', default='/home/pi/mqttsensord/mqttserver.log')
+    parser.add_argument('-p', '--pid-file', default='/home/pi/mqttsensord/mqttsensor.pid')
+    parser.add_argument('-l', '--log-file', default='/home/pi/mqttsensord/mqttsensor.log')
     parser.add_argument('-d', '--working-dir', default='/home/pi/mqttsensord')
     parser.add_argument('-c', '--config-file', default='/home/pi/mqttsensord/mqttsensord.json')
     parser.add_argument('-n', '--no-daemon', action="store_true")
