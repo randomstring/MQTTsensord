@@ -105,12 +105,9 @@ def read_sensor(client, sensor, userdata):
 
     userdata['logger'].debug("publish sensor data [" +
                              sensor['topic'])
-    userdata['logger'].debug("publish sensor data [" +
-                             sensor_data)
 
     client.publish(sensor['topic'], payload=sensor_data, qos=0,
                    retain=False)
-
 
 #
 # Callback for when the client receives a CONNACK response from the server.
