@@ -3,8 +3,8 @@ Description=MQTT sensor server
 After=network.target
 
 [Service]
-ExecStart=/usr/bin/python3 /home/pi/mqttserverd/mqttserverdd.py
-WorkingDirectory=/home/pi/mqttserverd
+ExecStart=/usr/bin/python3 /home/pi/mqttsensord/mqttsensord.py
+WorkingDirectory=/home/pi/mqttsensord
 StandardOutput=inherit
 StandardError=inherit
 Type=idle
