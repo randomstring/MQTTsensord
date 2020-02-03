@@ -37,7 +37,7 @@ sudo chmod 644 /lib/systemd/system/mqttsensord.service
 sudo systemctl daemon-reload
 sudo systemctl enable mqttsensord.service
 sudo systemctl start mqttsensord.service
-tail -f /home/pi/mqttsensord/weasleyclock.log
+tail -f /home/pi/mqttsensord/mqttsensor.log
 ```
 
 
