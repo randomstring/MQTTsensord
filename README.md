@@ -64,7 +64,7 @@ Here is an example MQTT response:
 ```
 
 Requires installation and configuration of apcupsd. See
-[https://wiki.debian.org/apcupsd](Debian apcupsd) for instructions on
+[Debian apcupsd](https://wiki.debian.org/apcupsd) for instructions on
 how to install ``apcupsd`` and to configure multiple UPSs connected to
 the same computer.
 
