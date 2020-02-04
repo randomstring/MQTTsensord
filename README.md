@@ -80,7 +80,11 @@ the same computer.
 
 ### LED
 
+**Coming Eventually**
+
 ### Motors and Servos
+
+**Coming Eventually**
 
 ## Installation
 
@@ -138,23 +142,14 @@ Example Home Assistant sensor configuration for a UPS sensors:
     name: "ups3_time_remaining"
     state_topic: "sensor/ups3"
     unit_of_measurement: minutes
-    value_template: "{{ value_json.TIMELEFT_MINUTES }}"
+    value_template: "{{ value_json.TIMELEFT_MINUTES | int }}"
     icon: mdi:timer
   - platform: mqtt
     name: "ups3_battery_charge"
     state_topic: "sensor/ups3"
     unit_of_measurement: percent
-    value_template: "{{ value_json.BCHARGE_PERCENT }}"
-    icon_template: >
-      {% set battery_level = states.sensor.ups1_battery_charge.state | default(0) | int %}
-      {% set battery_round = (battery_level / 10) |int * 10 %}
-      {% if battery_round >= 100 %}
-        mdi:battery
-      {% elif battery_round > 0 %}
-        mdi:battery-{{ battery_round }}
-      {% else %}
-        mdi:battery-alert
-      {% endif %}
+    value_template: "{{ value_json.BCHARGE_PERCENT | int }}"
+    icon: mdi:battery
 ```
 
 Here is what it looks like in my Home Assistant dashboard:
