@@ -127,7 +127,7 @@ test messages.
 
 # Home Assistant Integration
 
-I use [https://www.home-assistant.io/](Home Assistant) for tracking
+I use [Home Assistant](https://www.home-assistant.io/) for tracking
 MQTT data and creating automations.
 
 Example Home Assistant sensor configuration for a UPS sensors:
