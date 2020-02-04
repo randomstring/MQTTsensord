@@ -4,7 +4,7 @@ Python daemon transmitting local sensor updates using MQTT.
 
 ## MQTT Sensor Daemon
 
-This is working, but far from complete.
+This project works. I plan to add more sensor options.
 
 ## Sensors
 
@@ -12,14 +12,46 @@ The plan is to make an extensible platform for adding new
 sensors. Anything the raspberry pi can support. With a fallback
 command line parsing option.
 
-### Temperature dht22 and dht11
+### Temperature dht11 and dht22
 
-**Coming Soon**
+Reads temperature and humidity from dht11 and dht22 sensors from a
+RaspberryPi's GPIO port.
+
+Configuration examples for both:
+
+``` json
+{
+    "type": "dht22",
+    "name": "Environmental",
+    "topic": "sensor/environment/office",
+    "gpio": 4
+},
+{
+    "type": "dht11",
+    "name": "Environmental",
+    "topic": "sensor/environment/garage",
+    "gpio": 18
+}
+```
 
 ### apcupsd
 
 This sensor runs the ``apcaccess`` command to get the UPS status and
-sends a JSON message via MQTT. This message includes the following fields:
+sends a JSON message via MQTT.
+
+Configuration example:
+
+``` json
+{
+    "type": "apcups",
+    "name": "UPS1",
+    "topic": "sensor/ups1",
+    "host": "localhost",
+    "port": 3551
+},
+```
+
+Here is an example MQTT response:
 
 ``` json
 {
@@ -28,12 +60,19 @@ sends a JSON message via MQTT. This message includes the following fields:
  "BCHARGE_PERCENT": "100.0",
  "STATUS": "ONLINE",
  "UPSNAME": "UPS3"
- }
+}
 ```
 
-Requires installation and configuration of apcupsd.
+Requires installation and configuration of apcupsd. See
+[https://wiki.debian.org/apcupsd](Debian apcupsd) for instructions on
+how to install ``apcupsd`` and to configure multiple UPSs connected to
+the same computer.
 
 ### Reed Switches
+
+**Coming Soon**
+
+### Gas Sensors
 
 **Coming Soon**
 
@@ -81,3 +120,45 @@ the reciever is not listening for the given topic. Adding the MQTT
 wildcard ``#`` as a listening topic is one way to get around
 this. Test connectivity with the mqtt command line tools to send a few
 test messages.
+
+# Home Assistant Integration
+
+I use [https://www.home-assistant.io/](Home Assistant) for tracking
+MQTT data and creating automations.
+
+Example Home Assistant sensor configuration for a UPS sensors:
+
+``` yaml
+  - platform: mqtt
+    name: "ups3"
+    state_topic: "sensor/ups3"
+    value_template: "{{ value_json.STATUS }}"
+    icon: mdi:car-battery
+  - platform: mqtt
+    name: "ups3_time_remaining"
+    state_topic: "sensor/ups3"
+    unit_of_measurement: minutes
+    value_template: "{{ value_json.TIMELEFT_MINUTES }}"
+    icon: mdi:timer
+  - platform: mqtt
+    name: "ups3_battery_charge"
+    state_topic: "sensor/ups3"
+    unit_of_measurement: percent
+    value_template: "{{ value_json.BCHARGE_PERCENT }}"
+    icon_template: >
+      {% set battery_level = states.sensor.ups1_battery_charge.state | default(0) | int %}
+      {% set battery_round = (battery_level / 10) |int * 10 %}
+      {% if battery_round >= 100 %}
+        mdi:battery
+      {% elif battery_round > 0 %}
+        mdi:battery-{{ battery_round }}
+      {% else %}
+        mdi:battery-alert
+      {% endif %}
+```
+
+Here is what it looks like in my Home Assistant dashboard:
+
+![UPS Time Remaining Graph](https://raw.githubusercontent.com/randomstring/MQTTServerd/master/imgs/homeassistant_ups1.png)
+
+![Multipe UPS Card](https://raw.githubusercontent.com/randomstring/MQTTServerd/master/imgs/homeassistant_ups2.png)
