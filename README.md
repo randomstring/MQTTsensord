@@ -159,6 +159,6 @@ Example Home Assistant sensor configuration for a UPS sensors:
 
 Here is what it looks like in my Home Assistant dashboard:
 
-![UPS Time Remaining Graph](https://raw.githubusercontent.com/randomstring/MQTTServerd/master/imgs/homeassistant_ups1.png)
+![UPS Time Remaining Graph](https://raw.githubusercontent.com/randomstring/MQTTServer/master/imgs/homeassistant_ups1.png)
 
-![Multipe UPS Card](https://raw.githubusercontent.com/randomstring/MQTTServerd/master/imgs/homeassistant_ups2.png)
+![Multipe UPS Card](https://raw.githubusercontent.com/randomstring/MQTTServer/master/imgs/homeassistant_ups2.png)
