@@ -11,6 +11,7 @@ import lockfile
 import re
 import subprocess
 import Adafruit_DHT as dht
+import threading
 
 debug_p = True
 
@@ -19,7 +20,7 @@ debug_p = True
 # wrapper for MQTT JSON generation
 #
 def json_response(data):
-    return json.dumps(data)
+    return json.dumps(data, sort_keys=true)
 
 
 #
@@ -116,8 +117,26 @@ def read_sensor(client, sensor, userdata):
     userdata['logger'].debug("publish sensor data [" +
                              sensor['topic'])
 
-    client.publish(sensor['topic'], payload=sensor_data, qos=0,
+
+    default_interval = userdate['config_data']['default_interval']
+    interval = sensor['interval'] if 'interval' in sensor else default_interval
+    min_update = sensor['min_update'] if 'min_update' in sensor else 0
+    if not last in sensor:
+        sensor['last'] = 'first time'
+
+    # Only send update if the results are different or we're past the
+    # minimum update period
+    if ((sensor_data != sensor['last']) or
+        (sensor['last_update_time'] + min_update < time.time())):
+
+        client.publish(sensor['topic'], payload=sensor_data, qos=0,
                    retain=False)
+        sensor['last'] = sensor_data
+        sensor['last_update_time'] = time.time()
+
+    # start a new threaded timer to call this again.
+    threading.Timer(interval, read_sensor, args=(client, sensor, userdata)).start()
+    
 
 #
 # Callback for when the client receives a CONNACK response from the server.
@@ -232,6 +251,7 @@ def do_something(logf, configf):
     host = config_data['mqtt_host']
     port = config_data['mqtt_port'] if 'mqtt_port' in config_data else 4884
     interval = config_data['interval'] if 'interval' in config_data else 5
+    config_data['default_interval'] = interval
 
     logger.info("connecting to host " + host + ":" + str(port))
 
@@ -263,10 +283,11 @@ def do_something(logf, configf):
     mqttc.connect(host, port, 60)
     mqttc.loop_start()
 
+    for sensor in config_data['sensors']:
+        read_sensor(mqttc, sensor, userdata)
+
     while True:
-        for sensor in config_data['sensors']:
-            read_sensor(mqttc, sensor, userdata)
-        time.sleep(interval)
+        time.sleep(5)
 
     mqttc.disconnect()
     mqttc.loop_stop()
