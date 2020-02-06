@@ -12,6 +12,17 @@ The plan is to make an extensible platform for adding new
 sensors. Anything the raspberry pi can support. With a fallback
 command line parsing option.
 
+### General Configuration settings
+
+``poll_interval`` is the interval in seconds between reading the
+sensor 
+
+``update_interval`` is the max time between sending data. This
+will silence MQTT messages if the sensor data has not changed since
+the last sent message. This controls what the maximum time is between
+MQTT messages about this sensor. Setting to ``0`` disables.
+
+
 ### Temperature dht11 and dht22
 
 Reads temperature and humidity from dht11 and dht22 sensors from a
@@ -46,6 +57,8 @@ Configuration example:
     "type": "apcups",
     "name": "UPS1",
     "topic": "sensor/ups1",
+	"interval": 5,
+	"min_update": 900,
     "host": "localhost",
     "port": 3551
 },

@@ -11,7 +11,6 @@ import lockfile
 import re
 import subprocess
 import Adafruit_DHT as dht
-import threading
 
 debug_p = True
 
@@ -114,29 +113,24 @@ def read_sensor(client, sensor, userdata):
         sensor_data = json_response({'error':
                                      'bad sensor type: ' + sensor_type})
 
-    userdata['logger'].debug("publish sensor data [" +
-                             sensor['topic'])
+    userdata['logger'].debug("update sensor data: " + sensor['topic'])
 
-
-    default_interval = userdate['config_data']['default_interval']
-    interval = sensor['interval'] if 'interval' in sensor else default_interval
-    min_update = sensor['min_update'] if 'min_update' in sensor else 0
-    if not last in sensor:
-        sensor['last'] = 'first time'
+    now = time.time()
+    sensor['last_updated'] = now
 
     # Only send update if the results are different or we're past the
     # minimum update period
-    if ((sensor_data != sensor['last']) or
-        (sensor['last_update_time'] + min_update < time.time())):
+    if ((sensor_data != sensor['last_sent_data']) or
+        (sensor['last_sent_time'] + sensor['update_interval'] > now)):
 
         client.publish(sensor['topic'], payload=sensor_data, qos=0,
-                   retain=False)
-        sensor['last'] = sensor_data
-        sensor['last_update_time'] = time.time()
-
-    # start a new threaded timer to call this again.
-    threading.Timer(interval, read_sensor, args=(client, sensor, userdata)).start()
-    
+                       retain=False)
+        
+        userdata['logger'].debug("publish sensor data: " +
+                                 sensor['topic'])
+        
+        sensor['last_sent_data'] = sensor_data
+        sensor['last_sent_time'] = now
 
 #
 # Callback for when the client receives a CONNACK response from the server.
@@ -212,7 +206,9 @@ def _on_message(client, userdata, message):
     #    if debug_p:
     #        print("JSON decode failed: " + str(parse_error))
 
-    move_clock_hands(name, msg_data, userdata)
+    # TODO: process incoming msg_data
+    # handle_message(topic, msg_data, userdata)
+
 
 
 def move_servo(name, message, userdata):
@@ -250,8 +246,7 @@ def do_something(logf, configf):
     # connect to MQTT server
     host = config_data['mqtt_host']
     port = config_data['mqtt_port'] if 'mqtt_port' in config_data else 4884
-    interval = config_data['interval'] if 'interval' in config_data else 5
-    config_data['default_interval'] = interval
+    default_interval = config_data['default_interval'] if 'default_interval' in config_data else 5
 
     logger.info("connecting to host " + host + ":" + str(port))
 
@@ -284,10 +279,32 @@ def do_something(logf, configf):
     mqttc.loop_start()
 
     for sensor in config_data['sensors']:
+        # set defaults
+        poll_interval = sensor['poll_interval'] if 'poll_interval' in sensor else default_interval
+        update_interval = sensor['update_interval'] if 'update_interval' in sensor else 0
+        sensor['last_sent_data'] = None
+        sensor['last_sent_time'] = 0
+        sensor['last_updated'] = 0
+        sensor['update_interval'] = update_interval
+        sensor['poll_interval'] = interval
+    
+    for sensor in config_data['sensors']:
+        # first time for each sensor
         read_sensor(mqttc, sensor, userdata)
 
     while True:
-        time.sleep(5)
+        time.sleep(1)
+        now = time.time()
+        for sensor in config_data['sensors']:
+            if sensor['last_updated'] + sensor['poll_interval'] > now:
+                print("read_sensor:", sensor)
+                try:
+                    read_sensor(mqttc, sensor, userdata)
+                except Exception as e:
+                    userdata['logger'].error("read_sensor failed: {}".format(e))
+                    userdata['logger'].error("read_sensor failed: {}".format(sensor))
+                print(sensor)
+
 
     mqttc.disconnect()
     mqttc.loop_stop()
