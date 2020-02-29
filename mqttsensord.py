@@ -12,7 +12,7 @@ import re
 import subprocess
 import Adafruit_DHT as dht
 
-debug_p = True
+debug_p = False
 
 
 #
@@ -85,6 +85,9 @@ def apcaccess_json(host='localhost', port='3551'):
     return json_response(ups_data)
 
 
+#
+# read_dht - read temperature and humidity from dht11/dht22 sensor
+#
 def read_dht(client, sensor, userdata, dht_type=dht.DHT22):
     sensor_data = {}
     # TODO: error checking on GPIO
@@ -224,14 +227,18 @@ def _on_message(client, userdata, message):
 
 
 
+#
+# move a sevro - coming soon...
+#
 def move_servo(name, message, userdata):
-    #
-    # move a sevro
-    #
     # config_data = userdata['config_data']
     pass
 
 
+#
+# This starts the work part of the deamon. Starts MQTT client.
+# Runs scheduler loop to poll sensors.
+#
 def do_something(logf, configf):
 
     #
