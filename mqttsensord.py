@@ -91,7 +91,7 @@ def apcaccess_json(host='localhost', port='3551'):
 def read_dht(client, sensor, userdata, dht_type=dht.DHT22):
     sensor_data = {}
     # TODO: error checking on GPIO
-    humidity, temperature = dht.read_retry(dht_type, sensor['GPIO'])
+    humidity, temperature = dht.read_retry(dht_type, sensor['gpio'])
     humidity = round(humidity, 2)
     temperature = round(temperature, 2)
     sensor_data['temperature'] = temperature
