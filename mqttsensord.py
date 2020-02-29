@@ -119,7 +119,7 @@ def read_sensor(client, sensor, userdata):
     sensor['last_updated'] = now
 
     if debug_p:
-        print('Sensor Topic: ', sensor_data['topic'])
+        print('Sensor Topic: ', sensor['topic'])
 
     # Only send update if the results are different or we're past the
     # minimum update period
