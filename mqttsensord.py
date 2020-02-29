@@ -263,6 +263,7 @@ def do_something(logf, configf):
     logger.info("connecting to host " + host + ":" + str(port))
 
     if debug_p:
+        logger.setLevel(logging.DEBUG)
         print("connecting to host " + host + ":" + str(port))
 
     userdata = {
@@ -359,8 +360,6 @@ if __name__ == "__main__":
 
     if args.verbose:
         debug_p = True
-        logger.setLevel(logging.DEBUG)
-
 
     start_daemon(pidf=args.pid_file,
                  logf=args.log_file,
