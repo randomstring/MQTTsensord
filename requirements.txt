@@ -2,3 +2,4 @@ paho-mqtt
 python-daemon
 lockfile
 adafruit-circuitpython-servokit
+Adafruit-Python-DHT
