@@ -301,7 +301,7 @@ def do_something(logf, configf):
         sensor['last_sent_time'] = 0
         sensor['last_updated'] = 0
         sensor['update_interval'] = update_interval
-        sensor['poll_interval'] = interval
+        sensor['poll_interval'] = poll_interval
     
     for sensor in config_data['sensors']:
         # first time for each sensor
