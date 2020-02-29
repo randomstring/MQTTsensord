@@ -11,33 +11,43 @@
 	    "name": "UPS1",
 	    "topic": "sensor/ups1",
 	    "host": "localhost",
-	    "port": 3551
+	    "port": 3551,
+	    "poll_interval": 5,
+	    "update_interval": 600
 	},
 	{
 	    "type": "apcups",
 	    "name": "UPS2",
 	    "topic": "sensor/ups2",
 	    "host": "localhost",
-	    "port": 3552
+	    "port": 3552,
+	    "poll_interval": 5,
+	    "update_interval": 600
 	},
 	{
 	    "type": "apcups",
 	    "name": "UPS3",
 	    "topic": "sensor/ups3",
 	    "host": "localhost",
-	    "port": 3552
+	    "port": 3552,
+            "poll_interval": 5,
+	    "update_interval": 600
 	},
 	{
 	    "type": "dht22",
 	    "name": "Environmental",
 	    "topic": "sensor/environment/office",
-	    "gpio": 4
+	    "gpio": 4,
+	    "poll_interval": 5,
+	    "update_interval": 300
 	},
 	{
 	    "type": "dht11",
 	    "name": "Environmental",
 	    "topic": "sensor/environment/garage",
-	    "gpio": 18
+	    "gpio": 18,
+	    "poll_interval": 30,
+	    "update_interval": 600
 	}
     ]
 }
