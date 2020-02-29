@@ -19,7 +19,7 @@ debug_p = True
 # wrapper for MQTT JSON generation
 #
 def json_response(data):
-    return json.dumps(data, sort_keys=true)
+    return json.dumps(data, sort_keys=True)
 
 
 #
