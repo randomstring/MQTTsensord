@@ -6,6 +6,16 @@ Python daemon transmitting local sensor updates using MQTT.
 
 This project works. I plan to add more sensor options.
 
+My motivation came from wanting to easily integrate sensors attached
+to a raspberry pi to my [Home
+Assistant](https://www.home-assistant.io/). The real need came when I
+started using muplitple APC UPS devices to keep my network running
+through power outages. I wanted to montior and get notifications of
+power outages and how much battery reserve was left. Sadly, the APC
+UPS intergration only supported a single APCUPS. So I deced to create
+this daemon to generate MQTT updates so I can integrate an arbirary
+number of UPS devices into Home Assistant.
+
 ## Sensors
 
 The plan is to make an extensible platform for adding new
