@@ -342,6 +342,8 @@ if __name__ == "__main__":
 
     if args.verbose:
         debug_p = True
+        logger.setLevel(logging.DEBUG)
+
 
     start_daemon(pidf=args.pid_file,
                  logf=args.log_file,
