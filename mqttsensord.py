@@ -125,10 +125,10 @@ def read_sensor(client, sensor, userdata):
     # Only send update if the results are different or we're past the
     # minimum update period
     if ((sensor_data != sensor['last_sent_data']) or
-        (sensor['last_sent_time'] + sensor['update_interval'] > now)):
+        (sensor['last_sent_time'] + sensor['update_interval'] < now)):
 
         if debug_p:
-            if (sensor['last_sent_time'] + sensor['update_interval'] > now):
+            if (sensor['last_sent_time'] + sensor['update_interval'] < now):
                 print('update_interval exceeded')
             print('PUBLISHING SENSOR DATA to MQTT')
 
@@ -311,7 +311,7 @@ def do_something(logf, configf):
         time.sleep(1)
         now = time.time()
         for sensor in config_data['sensors']:
-            if sensor['last_updated'] + sensor['poll_interval'] > now:
+            if sensor['last_updated'] + sensor['poll_interval'] < now:
                 if debug_p:
                     print("read_sensor:", sensor)
                 try:
