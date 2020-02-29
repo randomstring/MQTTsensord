@@ -118,10 +118,19 @@ def read_sensor(client, sensor, userdata):
     now = time.time()
     sensor['last_updated'] = now
 
+    if debug_p:
+        print('sensor data:')
+        print(sensor_data)
+
     # Only send update if the results are different or we're past the
     # minimum update period
     if ((sensor_data != sensor['last_sent_data']) or
         (sensor['last_sent_time'] + sensor['update_interval'] > now)):
+
+        if debug_p:
+            if (sensor['last_sent_time'] + sensor['update_interval'] > now):
+                print('update_interval exceeded')
+            print('PUBLISHING SENSOR DATA to MQTT')
 
         client.publish(sensor['topic'], payload=sensor_data, qos=0,
                        retain=False)
@@ -131,6 +140,9 @@ def read_sensor(client, sensor, userdata):
         
         sensor['last_sent_data'] = sensor_data
         sensor['last_sent_time'] = now
+    else:
+        if debug_p:
+            print('NO CHANGE in DATA')
 
 #
 # Callback for when the client receives a CONNACK response from the server.
@@ -260,8 +272,10 @@ def do_something(logf, configf):
         'config_data': config_data,
         }
 
+    client_id = config_data['client_id'] if 'client_id' in config_data else 'mqttsensord'
+
     # how to mqtt in python see https://pypi.org/project/paho-mqtt/
-    mqttc = mqtt.Client(client_id='mqttsensord',
+    mqttc = mqtt.Client(client_id=client_id,
                         clean_session=True,
                         userdata=userdata)
 
@@ -297,13 +311,16 @@ def do_something(logf, configf):
         now = time.time()
         for sensor in config_data['sensors']:
             if sensor['last_updated'] + sensor['poll_interval'] > now:
-                print("read_sensor:", sensor)
+                if debug_p:
+                    print("read_sensor:", sensor)
                 try:
                     read_sensor(mqttc, sensor, userdata)
                 except Exception as e:
                     userdata['logger'].error("read_sensor failed: {}".format(e))
                     userdata['logger'].error("read_sensor failed: {}".format(sensor))
-                print(sensor)
+                if debug_p:
+                    print(sensor)
+                    print('---------------------')
 
 
     mqttc.disconnect()
