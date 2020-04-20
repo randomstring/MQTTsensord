@@ -67,8 +67,8 @@ Configuration example:
     "type": "apcups",
     "name": "UPS1",
     "topic": "sensor/ups1",
-	"interval": 5,
-	"min_update": 900,
+    "poll_interval": 5,
+    "update_interval": 900,
     "host": "localhost",
     "port": 3551
 },
