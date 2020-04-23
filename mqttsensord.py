@@ -127,7 +127,7 @@ def read_sensor(client, sensor, userdata):
     # Only send update if the results are different or we're past the
     # minimum update period
     if ((sensor_data != sensor['last_sent_data']) or
-        (sensor['last_sent_time'] + sensor['update_interval'] < now)):
+            (sensor['last_sent_time'] + sensor['update_interval'] < now)):
 
         if debug_p:
             if (sensor['last_sent_time'] + sensor['update_interval'] < now):
@@ -138,10 +138,10 @@ def read_sensor(client, sensor, userdata):
 
         client.publish(sensor['topic'], payload=sensor_data, qos=0,
                        retain=False)
-        
+
         userdata['logger'].debug("publish sensor data: " +
                                  sensor['topic'])
-        
+
         sensor['last_sent_data'] = sensor_data
         sensor['last_sent_time'] = now
     else:
