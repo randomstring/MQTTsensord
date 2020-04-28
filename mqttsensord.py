@@ -226,7 +226,6 @@ def _on_message(client, userdata, message):
     # handle_message(topic, msg_data, userdata)
 
 
-
 #
 # move a sevro - coming soon...
 #
@@ -310,7 +309,7 @@ def do_something(logf, configf):
         sensor['last_updated'] = 0
         sensor['update_interval'] = update_interval
         sensor['poll_interval'] = poll_interval
-    
+
     for sensor in config_data['sensors']:
         # first time for each sensor
         read_sensor(mqttc, sensor, userdata)
@@ -328,7 +327,6 @@ def do_something(logf, configf):
                 if debug_p:
                     print(sensor)
                     print('---------------------')
-
 
     mqttc.disconnect()
     mqttc.loop_stop()
