@@ -173,6 +173,12 @@ Example Home Assistant sensor configuration for a UPS sensors:
     unit_of_measurement: percent
     value_template: "{{ value_json.BCHARGE_PERCENT | int }}"
     icon: mdi:battery
+  - platform: mqtt
+    name: "ups3_input_voltage"
+    state_topic: "sensor/ups3"
+    unit_of_measurement: V
+    value_template: "{{ value_json.LINEV_VOLTS | int }}"
+    icon: mdi:power-socket-us
 ```
 
 Here is what it looks like in my Home Assistant dashboard:
