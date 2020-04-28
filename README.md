@@ -156,6 +156,7 @@ MQTT data and creating automations.
 Example Home Assistant sensor configuration for a UPS sensors:
 
 ``` yaml
+sensor:
   - platform: mqtt
     name: "ups3"
     state_topic: "sensor/ups3"
