@@ -264,7 +264,7 @@ def do_something(logf, configf):
 
     # connect to MQTT server
     host = config_data['mqtt_host']
-    port = config_data['mqtt_port'] if 'mqtt_port' in config_data else 4884
+    port = config_data['mqtt_port'] if 'mqtt_port' in config_data else 8883
     default_interval = config_data['default_interval'] if 'default_interval' in config_data else 5
 
     logger.info("connecting to host " + host + ":" + str(port))
@@ -280,6 +280,7 @@ def do_something(logf, configf):
         'config_data': config_data,
         }
 
+    # Client id needs to be unique to this client
     client_id = config_data['client_id'] if 'client_id' in config_data else 'mqttsensord'
 
     # how to mqtt in python see https://pypi.org/project/paho-mqtt/
@@ -294,7 +295,7 @@ def do_something(logf, configf):
     mqttc.on_connect = on_connect
     mqttc.on_message = on_message
 
-    if port == 4883 or port == 4884:
+    if port == 4883 or port == 4884 or port == 8883 or port == 8884:
         mqttc.tls_set('/etc/ssl/certs/ca-certificates.crt')
 
     mqttc.connect(host, port, 60)
