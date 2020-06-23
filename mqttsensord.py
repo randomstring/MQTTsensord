@@ -242,16 +242,20 @@ def move_servo(name, message, userdata):
 def do_something(logf, configf):
 
     #
-    # setup logging
+    # setup logging with log rotation
     #
     logger = logging.getLogger('mqttsensord')
     logger.setLevel(logging.INFO)
-    fh = logging.FileHandler(logf)
-    fh.setLevel(logging.INFO)
+
     formatstr = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
     formatter = logging.Formatter(formatstr)
-    fh.setFormatter(formatter)
-    logger.addHandler(fh)
+
+    handler = logging.handlers.RotatingFileHandler(
+              logf, maxBytes=1049600, backupCount=10)
+
+    handler.setLevel(logging.INFO)
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
 
     # read config file
     with open(configf) as json_data_file:
