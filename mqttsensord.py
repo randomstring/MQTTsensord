@@ -148,6 +148,7 @@ def read_sensor(client, sensor, userdata):
         if debug_p:
             print('NO CHANGE in DATA')
 
+
 #
 # Callback for when the client receives a CONNACK response from the server.
 #
@@ -298,7 +299,15 @@ def do_something(logf, configf):
     if port == 4883 or port == 4884 or port == 8883 or port == 8884:
         mqttc.tls_set('/etc/ssl/certs/ca-certificates.crt')
 
-    mqttc.connect(host, port, 60)
+    while(True):
+        try:
+            mqttc.connect(host, port, 60)
+            break
+        except Exception as e:
+            # Connection failure.
+            userdata['logger'].error("connect() failed: {}".format(e))
+            time.sleep(60)
+
     mqttc.loop_start()
 
     for sensor in config_data['sensors']:
