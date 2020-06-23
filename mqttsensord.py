@@ -363,7 +363,7 @@ def start_daemon(pidf, logf, wdir, configf, nodaemon):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="MQTT Sensor Deamon")
-    parser.add_argument('-p', '--pid-file', default='/home/pi/mqttsensord/mqttsensor.pid')
+    parser.add_argument('-p', '--pid-file', default='/run/lock/mqttsensor.pid')
     parser.add_argument('-l', '--log-file', default='/home/pi/mqttsensord/mqttsensor.log')
     parser.add_argument('-d', '--working-dir', default='/home/pi/mqttsensord')
     parser.add_argument('-c', '--config-file', default='/home/pi/mqttsensord/mqttsensord.json')
